@@ -1,0 +1,48 @@
+#define TRIG_PIN 23
+#define ECHO_PIN 21
+#define BUZZER_PIN 19
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+}
+
+long getDistance() {
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+
+  long duration = pulseIn(ECHO_PIN, HIGH);
+  long distance = duration * 0.034 / 2; // Convert to cm
+
+  return distance;
+}
+
+void loop() {
+  long distance = getDistance();
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  if (distance < 100) { // If object is within 1 meter
+    int beepDelay;
+
+    if (distance > 70) beepDelay = 500;
+    else if (distance > 40) beepDelay = 300;
+    else if (distance > 20) beepDelay = 150;
+    else beepDelay = 50;
+
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(50);
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(beepDelay);
+  } else {
+    digitalWrite(BUZZER_PIN, LOW);
+  }
+
+  delay(100);
+}
